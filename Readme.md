@@ -11,6 +11,7 @@ version: "3"
 services:
   statistics:
     image: nadavtasher/statistics
+    restart: unless-stopped    
     volumes:
       # Data volume
       - statistics_data:/opt
