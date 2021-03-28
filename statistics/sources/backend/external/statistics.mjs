@@ -68,7 +68,7 @@ logServer.bind(9000);
 
 // Export routes
 export const Routes = {
-    button: {
+    tag: {
         update: {
             handler: (parameters) => {
                 if (!Tags.hasOwnProperty(parameters.tag))

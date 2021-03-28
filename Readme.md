@@ -16,7 +16,7 @@ services:
       # Data volume
       - statistics_data:/opt
       # Configuration file
-      - ./configuration.mjs:/project/backend/external/configuration.mjs
+      - ./configuration.mjs:/project/backend/external/configuration.mjs:ro
 
 volumes:
   statistics_data:
