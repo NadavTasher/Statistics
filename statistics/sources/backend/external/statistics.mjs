@@ -10,7 +10,7 @@ import UDP from "dgram";
 import { File } from "../internal/utilities.mjs";
 
 // Import configuration
-import { Tags, Endpoints } from "./configuration.mjs";
+import { Password, Tags, Endpoints } from "./configuration.mjs";
 
 // Setup log server
 let logServer = UDP.createSocket("udp4");
@@ -38,6 +38,25 @@ const Update = (file, name) => {
     return value[name];
 };
 
+// Create clearing function
+const Clear = (file, name) => {
+    // Read the file
+    let value = file.read({});
+
+    // Make sure the value exists
+    if (!value.hasOwnProperty(name))
+        throw new Error("No such entry");
+
+    // Delete entry
+    delete value[name];
+
+    // Write new data
+    file.write(value);
+
+    // Return true
+    return true;
+};
+
 logServer.on("message", (message) => {
     try {
         // Parse the log line
@@ -54,7 +73,7 @@ logServer.on("message", (message) => {
         if (!Endpoints.hasOwnProperty(request.host))
             return;
 
-            // Make sure the URI is correct
+        // Make sure the URI is correct
         if (request.uri !== "/")
             return;
 
@@ -80,19 +99,75 @@ export const Routes = {
                 tag: "string"
             }
         },
+        clear: {
+            handler: (parameters) => {
+                // Check password
+                if (parameters.password !== Password)
+                    throw new Error("Invalid password");
+
+                // Clear entry
+                return Clear(tagsFile, parameters.name);
+            },
+            parameters: {
+                name: "string",
+                password: "string"
+            }
+        },
         fetch: {
             handler: (parameters) => {
+                // Check password
+                if (parameters.password !== Password)
+                    throw new Error("Invalid password");
+
+                // Read statistics
                 return tagsFile.read({});
             },
-            parameters: {}
+            parameters: {
+                password: "string"
+            }
         }
     },
     endpoint: {
+        clear: {
+            handler: (parameters) => {
+                // Check password
+                if (parameters.password !== Password)
+                    throw new Error("Invalid password");
+
+                // Clear entry
+                return Clear(endpointsFile, parameters.name);
+            },
+            parameters: {
+                name: "string",
+                password: "string"
+            }
+        },
         fetch: {
             handler: (parameters) => {
+                // Check password
+                if (parameters.password !== Password)
+                    throw new Error("Invalid password");
+
+                // Read statistics
                 return endpointsFile.read({});
             },
-            parameters: {}
+            parameters: {
+                password: "string"
+            }
+        }
+    },
+    password: {
+        check: {
+            handler: (parameters) => {
+                // Check password
+                if (parameters.password !== Password)
+                    throw new Error("Invalid password");
+
+                return true;
+            },
+            parameters: {
+                password: "string"
+            }
         }
     }
 };

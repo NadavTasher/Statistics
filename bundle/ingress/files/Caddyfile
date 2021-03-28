@@ -1,0 +1,20 @@
+# Automatic TLS
+
+* {
+    tls internal
+}
+
+# Log piping
+
+:443 {
+    log {
+        output net udp/statistics:9000
+        format json
+    }
+}
+
+# Reverse proxies
+
+http://statistics, https://statistics {
+    reverse_proxy statistics:80
+}

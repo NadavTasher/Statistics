@@ -1,13 +1,26 @@
 version: "3"
 services:
+  ingress:
+    build: ingress
+    restart: unless-stopped
+    ports: 
+      - 80:80
+      - 443:443
+    volumes: 
+      # Ingress volume
+      - ingress_data:/data
+      - ingress_configuration:/config
+
   statistics:
-    image: nadavtasher/statistics
+    build: statistics
     restart: unless-stopped    
     volumes:
       # Data volume
       - statistics_data:/opt
-      # Configuration file
-      - ./statistics/configuration.mjs:/project/backend/external/configuration.mjs:ro
 
 volumes:
+  # Ingress storage
+  ingress_data:
+  ingress_configuration:
+  # Statistics storage
   statistics_data:

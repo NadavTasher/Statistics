@@ -3,6 +3,8 @@
  * https://github.com/NadavTasher/Statistics/
  **/
 
+export const Password = "Default Password";
+
 export const Tags = {
     "tagID": "Description"
 };

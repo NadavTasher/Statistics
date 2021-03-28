@@ -2,4 +2,4 @@
 FROM nadavtasher/statistics
 
 # Copy configuration
-COPY configuration.mjs backend/external/configuration.mjs
+COPY files/configuration.mjs backend/external/configuration.mjs

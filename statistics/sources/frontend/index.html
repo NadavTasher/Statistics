@@ -57,31 +57,87 @@
     <!-- Application script -->
     <script type="text/javascript">
         window.addEventListener("load", async function () {
-            await Module.import("UI", "API");
+            await Module.import("UI", "API", "External:Dialog");
 
-            // Read tag statistics
-            API.call("tag", "fetch", {}).then(
-                (results) => {
-                    for (let [name, hits] of Object.entries(results)) {
-                        UI.find("tags").appendChild(UI.populate("statistic", {
-                            name: name,
-                            hits: hits
-                        }));
-                    }
-                }
-            ).catch();
+            // Statistic reading function
+            const statistics = (type) => {
+                // Read statistics
+                API.call(`${type}`, "fetch", {
+                    password: localStorage.password
+                }).then(
+                    (results) => {
+                        for (let [name, hits] of Object.entries(results)) {
+                            // Create entry
+                            let element = UI.populate("statistic", {
+                                name: name,
+                                hits: hits
+                            });
 
-            // Read endpoint statistics
-            API.call("endpoint", "fetch", {}).then(
-                (results) => {
-                    for (let [name, hits] of Object.entries(results)) {
-                        UI.find("endpoints").appendChild(UI.populate("statistic", {
-                            name: name,
-                            hits: hits
-                        }));
+                            // Set click listener
+                            element.addEventListener("click", () => {
+                                Dialog.confirm(`Do you want to clear the statistics for "${name}"`).then(
+                                    () => {
+                                        API.call(`${type}`, "clear", {
+                                            name: name,
+                                            password: localStorage.password
+                                        }).then(
+                                            () => {
+                                                location.reload();
+                                            }
+                                        ).catch(
+                                            (error) => {
+                                                Dialog.alert(error);
+                                            }
+                                        );
+                                    }
+                                ).catch();
+                            });
+
+                            // Append element
+                            UI.find(`${type}s`).appendChild(element);
+                        }
                     }
-                }
-            ).catch();
+                ).catch();
+            };
+
+            // Make sure password is entered
+            if (!localStorage.password) {
+                // Prompt for password
+                Dialog.prompt("Password").then(
+                    (password) => {
+                        // Set password
+                        localStorage.password = password;
+                        // Reload
+                        location.reload();
+                    }
+                ).catch(
+                    () => {
+                        // Reload
+                        location.reload();
+                    }
+                );
+            } else {
+                API.call("password", "check", {
+                    password: localStorage.password
+                }).then(
+                    () => {
+                        // Load statistics
+                        statistics("tag");
+                        statistics("endpoint");
+                    }
+                ).catch(
+                    (error) => {
+                        Dialog.alert(error).then(
+                            () => {
+                                // Delete password
+                                delete localStorage.password;
+                                // Reload
+                                location.reload();
+                            }
+                        )
+                    }
+                );
+            }
         });
     </script>
 

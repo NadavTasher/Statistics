@@ -3,6 +3,8 @@
  * https://github.com/NadavTasher/Statistics/
  **/
 
+export const Password = "";
+
 export const Tags = {
 
 };
