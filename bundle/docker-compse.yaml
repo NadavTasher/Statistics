@@ -1,0 +1,12 @@
+version: "3"
+services:
+  statistics:
+    image: nadavtasher/statistics
+    volumes:
+      # Data volume
+      - statistics_data:/opt
+      # Configuration file
+      - ./configuration.mjs:/project/backend/external/configuration.mjs
+
+volumes:
+  statistics_data:
